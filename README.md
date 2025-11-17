@@ -18,7 +18,7 @@ Os 9 clusters foram agrupados em 3 níveis de risco com base na taxa de mortalid
     * Perfil: Maior tempo de acompanhamento (`time`), creatinina baixa, fração de ejeção preservada.
 
 
----
+
 ## Como Prever o Risco
 
 O script `analyses/6_predicao.py` carrega os modelos treinados (normalizador e k-means) para classificar novos pacientes.
@@ -28,7 +28,7 @@ O script `analyses/6_predicao.py` carrega os modelos treinados (normalizador e k
 * **Predição:** Cluster 0
 * **Resultado:** Risco **ALTO** (Mortalidade esperada: 84.6%)
 
----
+
 ## Pipeline do Projeto
 1.  `1_EDA.py`: Análise Exploratória.
 2.  `2_pre_process.py`: Normalização dos dados (StandardScaler).
