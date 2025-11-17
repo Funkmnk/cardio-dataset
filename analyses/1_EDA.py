@@ -39,20 +39,20 @@ montar_divisor("ESTATÍSTICAS DESCRITIVAS", 60, "-")
 print(dados.describe().round(2))
 
 # Features binárias
-features_binarias = ['anaemia', 'diabetes', 'high_blood_pressure', 'sex', 'smoking', 'DEATH_EVENT']
+variaveis_binarias = ['anaemia', 'diabetes', 'high_blood_pressure', 'sex', 'smoking', 'DEATH_EVENT']
 
 # Features numéricas
-features_continuas = ['age', 'creatinine_phosphokinase', 'ejection_fraction', 
+variaveis_continuas = ['age', 'creatinine_phosphokinase', 'ejection_fraction', 
                       'platelets', 'serum_creatinine', 'serum_sodium', 'time']
 
-print(f"\nVARIÁVEIS BINÁRIAS: {len(features_binarias)}")
-print(features_binarias)
-print(f"VARIÁVEIS CONTÍNUAS: {len(features_continuas)}")
-print(features_continuas)
+print(f"\nVARIÁVEIS BINÁRIAS: {len(variaveis_binarias)}")
+print(variaveis_binarias)
+print(f"VARIÁVEIS CONTÍNUAS: {len(variaveis_continuas)}")
+print(variaveis_continuas)
 
 # Distribuição das variáveis binárias
 montar_divisor("DISTRIBUIÇÃO DAS VARIÁVEIS BINÁRIAS", 60, "-")
-for col in features_binarias:
+for col in variaveis_binarias:
     contagem = dados[col].value_counts()
     percentual = dados[col].value_counts(normalize=True) * 100
     print(f"{col}:")
@@ -62,29 +62,29 @@ for col in features_binarias:
 # Identificação dos outliers
 montar_divisor("IDENTIFICANDO OUTLIERS (Método IQR)", 60, "-")
 
-outliers_summary = {}
-for col in features_continuas:
+resumo_outliers = {}
+for col in variaveis_continuas:
     Q1 = dados[col].quantile(0.25)
     Q3 = dados[col].quantile(0.75)
-    IQR = Q3 - Q1
-    lower_bound = Q1 - 1.5 * IQR
-    upper_bound = Q3 + 1.5 * IQR
+    AIQ = Q3 - Q1
+    limite_inferior = Q1 - 1.5 * AIQ
+    limite_superior = Q3 + 1.5 * AIQ
     
     # Contar outliers
-    outliers = dados[(dados[col] < lower_bound) | (dados[col] > upper_bound)]
-    n_outliers = len(outliers)
-    pct_outliers = (n_outliers / len(dados)) * 100
+    outliers = dados[(dados[col] < limite_inferior) | (dados[col] > limite_superior)]
+    num_outliers = len(outliers)
+    pct_outliers = (num_outliers / len(dados)) * 100
     
-    outliers_summary[col] = {
-        'n_outliers': n_outliers,
+    resumo_outliers[col] = {
+        'num_outliers': num_outliers,
         'pct': pct_outliers,
-        'lower_bound': lower_bound,
-        'upper_bound': upper_bound
+        'limite_inferior': limite_inferior,
+        'limite_superior': limite_superior
     }
     
-    if n_outliers > 0:
-        print(f"{col}: {n_outliers} outliers ({pct_outliers:.1f}%)")
-        print(f"  Limites: [{lower_bound:.2f}, {upper_bound:.2f}]")
+    if num_outliers > 0:
+        print(f"{col}: {num_outliers} outliers ({pct_outliers:.1f}%)")
+        print(f"  Limites: [{limite_inferior:.2f}, {limite_superior:.2f}]")
     else:
         print(f"{col}: Sem outliers")
 
@@ -92,26 +92,26 @@ for col in features_continuas:
 montar_divisor("ANÁLISE DE CORRELAÇÃO", 60, "-")
 
 # Matriz de correlação
-correlation_matrix = dados.corr()
+matriz_correlacao = dados.corr()
 
 # Correlações mais fortes com DEATH_EVENT
-death_correlations = correlation_matrix['DEATH_EVENT'].sort_values(ascending=False)
+correlacoes_morte = matriz_correlacao['DEATH_EVENT'].sort_values(ascending=False)
 print("Correlações com DEATH_EVENT (evento de morte):")
-print(death_correlations.round(3))
+print(correlacoes_morte.round(3))
 
 # Correlações fortes (> 0.7 ou < -0.7)
 montar_divisor("CORRELAÇÕES FORTES (> 0.5)", 60, "-")
-correlations_high = []
-for i in range(len(correlation_matrix.columns)):
-    for j in range(i+1, len(correlation_matrix.columns)):
-        col1 = correlation_matrix.columns[i]
-        col2 = correlation_matrix.columns[j]
-        corr_val = correlation_matrix.iloc[i, j]
-        if abs(corr_val) > 0.5 and col1 != 'DEATH_EVENT' and col2 != 'DEATH_EVENT':
-            print(f"{col1} <-> {col2}: {corr_val:.3f}")
-            correlations_high.append((col1, col2, corr_val))
+correlacoes_altas = []
+for i in range(len(matriz_correlacao.columns)):
+    for j in range(i+1, len(matriz_correlacao.columns)):
+        col1 = matriz_correlacao.columns[i]
+        col2 = matriz_correlacao.columns[j]
+        valor_corr = matriz_correlacao.iloc[i, j]
+        if abs(valor_corr) > 0.5 and col1 != 'DEATH_EVENT' and col2 != 'DEATH_EVENT':
+            print(f"{col1} <-> {col2}: {valor_corr:.3f}")
+            correlacoes_altas.append((col1, col2, valor_corr))
 
-if not correlations_high:
+if not correlacoes_altas:
     print("Não há correlações fortes entre features")
     
 # TODO: Transformar as plotagens em funções reaproveitáveis e plotar todos os dados
